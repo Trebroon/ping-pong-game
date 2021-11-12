@@ -1,7 +1,9 @@
 import pygame
 from sys import exit
+from random import choice
 
 from settings import *
+              
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -32,6 +34,7 @@ ball_speed_y = 5
 
 
 
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -40,17 +43,41 @@ while True:
 
     pressed_keys = pygame.key.get_pressed()
     # Player Two Movement
+    # Up Movement
     if pressed_keys[pygame.K_UP]:
-        player_two_rect.y -= player_speed
+        if player_two_rect.y == 0:
+            player_two_rect.y = 0
+        else:
+            player_two_rect.y -= player_speed
+    # Down Movement
     if pressed_keys[pygame.K_DOWN]:
-        player_two_rect.y += player_speed
+        if player_two_rect.bottom == 600:
+            player_two_rect.bottom = 600
+        else:
+            player_two_rect.y += player_speed
+    # Player One Movement
+    # Up Movement
     if pressed_keys[pygame.K_w]:
-        player_one_rect.y -= player_speed
+        if player_one_rect.y == 0:
+            player_one_rect.y = 0
+        else:
+            player_one_rect.y -= player_speed
+    # Down Movement   
     if pressed_keys[pygame.K_s]:
-        player_one_rect.y += player_speed
+        if player_one_rect.bottom == 600:
+            player_one_rect.bottom = 600
+        else:
+            player_one_rect.y += player_speed
 
+    # Ball Movement
     ball_rect.x += ball_speed_x
     ball_rect.y += ball_speed_y
+    if ball_rect.top <= 0 or ball_rect.bottom >= screen_height:
+        ball_speed_y *= -1
+    if ball_rect.left <= 0 or ball_rect.right >= screen_width:
+        ball_speed_x *= -1
+    
+    
     
     screen.fill('black')
     screen.blit(player_one_surf, player_one_rect)
