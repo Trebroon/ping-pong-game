@@ -13,8 +13,10 @@ pygame.display.set_caption(caption)
 text_font = pygame.font.Font('fonts/Montserrat-Regular.otf', 20)
 
 # score
-player_one_score = text_font.render('0', True, 'grey')
-player_two_score = text_font.render('0', True, 'grey')
+player_one_score = 0
+player_two_score = 0
+player_one_text = text_font.render(f'{player_one_score}', True, 'grey')
+player_two_text = text_font.render(f'{player_two_score}', True, 'grey')
 
 
 
@@ -35,8 +37,8 @@ player_speed = 5
 ball_surf = pygame.Surface((10,10))
 ball_surf.fill('grey')
 ball_rect = ball_surf.get_rect(center = (500,300))
-ball_speed_x = 7
-ball_speed_y = 7
+ball_speed_x = 0
+ball_speed_y = 0
 
 
 
@@ -74,6 +76,30 @@ while True:
             player_one_rect.bottom = 600
         else:
             player_one_rect.y += player_speed
+    if pressed_keys[pygame.K_SPACE]:
+        if ball_rect.center == (500,300):
+            ball_speed_x = 7
+            ball_speed_y = 7
+            ball_rect.x += ball_speed_x
+            ball_rect.y += ball_speed_y
+            
+    if pressed_keys[pygame.K_KP0]:
+        if ball_rect.center == (500,300):
+            ball_speed_x = -7
+            ball_speed_y = -7
+            ball_rect.x += ball_speed_x
+            ball_rect.y += ball_speed_y
+    
+    if pressed_keys[pygame.K_r]:
+        if ball_rect.center == (500,300):
+            player_one_score = 0
+            player_one_text = text_font.render(f'{player_one_score}', True, 'grey')
+            player_one_rect.center = (2,300)
+            player_two_score = 0
+            player_two_text = text_font.render(f'{player_two_score}', True, 'grey')
+            player_two_rect.center = (998,300)
+            
+        
 
     # Ball Movement
     ball_rect.x += ball_speed_x
@@ -86,17 +112,34 @@ while True:
         ball_speed_x *= -1
     if ball_rect.colliderect(player_two_rect):
         ball_speed_x *= -1
+    # Ball getting out of bounce
+    if ball_rect.left >= 1020:
+        player_one_score += 1
+        player_one_text = text_font.render(f'{player_one_score}', True, 'grey')
+        ball_rect.center = (500,300)
+        ball_speed_x = 0
+        ball_speed_y = 0
+    if ball_rect.right <= -20:
+        player_two_score += 1
+        player_two_text = text_font.render(f'{player_two_score}', True, 'grey')
+        ball_rect.center = (500,300)
+        ball_speed_x = 0
+        ball_speed_y = 0
+
+            
+
+        
 
     
         
-    # ball_rect.left <= 0
+
     
     
     
     screen.fill('black')
     pygame.draw.line(screen, 'grey', (500,0), (500,600))
-    screen.blit(player_one_score, (470,300))
-    screen.blit(player_one_score, (520,300))
+    screen.blit(player_one_text, (470,300))
+    screen.blit(player_two_text, (520,300))
     screen.blit(player_one_surf, player_one_rect)
     screen.blit(player_two_surf, player_two_rect)
     pygame.draw.ellipse(screen, 'grey', ball_rect)
