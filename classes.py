@@ -1,7 +1,7 @@
 # Classes used in game
 from random import choice
 import pygame
-from constants import *
+from variables import *
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, width, height, pos_x, pos_y):
