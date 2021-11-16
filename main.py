@@ -1,150 +1,79 @@
 import pygame
 from sys import exit
-from random import choice
 
-from settings import *
-              
+from pygame.constants import KEYDOWN
+
+from constants import *
+from classes import *            
 
 pygame.init()
 clock = pygame.time.Clock()
 
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption(caption)
-text_font = pygame.font.Font('fonts/Montserrat-Regular.otf', 20)
-
-# score
-player_one_score = 0
-player_two_score = 0
-player_one_text = text_font.render(f'{player_one_score}', True, 'grey')
-player_two_text = text_font.render(f'{player_two_score}', True, 'grey')
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption(CAPTION)
+text_font = pygame.font.Font(FONT_PATH, FONT_SIZE)
+active = False
 
 
+players_group = pygame.sprite.Group()
+# Player One
+player_one = Player(PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_ONE_POS_X, PLAYER_ONE_POS_Y, PLAYER_SPEED)
+players_group.add(player_one)
+# Player Two
+player_two = Player(PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_TWO_POS_X, PLAYER_TWO_POS_Y, PLAYER_SPEED)
+players_group.add(player_two)
 
+# Ball
+ball_sprite = pygame.sprite.GroupSingle()
+ball = Ball(BALL_WIDTH, BALL_HEIGHT, BALL_INIT_POS_X, BALL_INIT_POS_Y, players_group)
+ball_sprite.add(ball)
 
-# player one
-player_one_surf = pygame.Surface((5,100))
-player_one_surf.fill('grey')
-player_one_rect = player_one_surf.get_rect(center = (2,300))
-
-# playeyr two
-player_two_surf = pygame.Surface((5,100))
-player_two_surf.fill('grey')
-player_two_rect = player_two_surf.get_rect(center = (998,300))
-
-player_speed = 5
-
-# ball
-ball_surf = pygame.Surface((10,10))
-ball_surf.fill('grey')
-ball_rect = ball_surf.get_rect(center = (500,300))
-ball_speed_x = 0
-ball_speed_y = 0
-
-
+# run game func
+run_game = Run_Game(players_group, ball_sprite)
 
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
-            exit()           
+            exit()    
+        # Game Start
+        if event.type == KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                ball.move = True       
 
     pressed_keys = pygame.key.get_pressed()
     # Player Two Movement
     # Up Movement
     if pressed_keys[pygame.K_UP]:
-        if player_two_rect.y == 0:
-            player_two_rect.y = 0
-        else:
-            player_two_rect.y -= player_speed
+        player_two.player_up()
     # Down Movement
     if pressed_keys[pygame.K_DOWN]:
-        if player_two_rect.bottom == 600:
-            player_two_rect.bottom = 600
-        else:
-            player_two_rect.y += player_speed
+        player_two.player_down()
     # Player One Movement
     # Up Movement
-    if pressed_keys[pygame.K_w]:
-        if player_one_rect.y == 0:
-            player_one_rect.y = 0
-        else:
-            player_one_rect.y -= player_speed
+    if pressed_keys[pygame.K_w]:     
+        player_one.player_up()
     # Down Movement   
     if pressed_keys[pygame.K_s]:
-        if player_one_rect.bottom == 600:
-            player_one_rect.bottom = 600
-        else:
-            player_one_rect.y += player_speed
-    if pressed_keys[pygame.K_SPACE]:
-        if ball_rect.center == (500,300):
-            ball_speed_x = 7
-            ball_speed_y = 7
-            ball_rect.x += ball_speed_x
-            ball_rect.y += ball_speed_y
-            
-    if pressed_keys[pygame.K_KP0]:
-        if ball_rect.center == (500,300):
-            ball_speed_x = -7
-            ball_speed_y = -7
-            ball_rect.x += ball_speed_x
-            ball_rect.y += ball_speed_y
-    
+        player_one.player_down()
+    # Game Reset
     if pressed_keys[pygame.K_r]:
-        if ball_rect.center == (500,300):
-            player_one_score = 0
-            player_one_text = text_font.render(f'{player_one_score}', True, 'grey')
-            player_one_rect.center = (2,300)
-            player_two_score = 0
-            player_two_text = text_font.render(f'{player_two_score}', True, 'grey')
-            player_two_rect.center = (998,300)
-            
-        
-
+        player_one.player_reset(PLAYER_ONE_POS_X)
+        player_two.player_reset(PLAYER_TWO_POS_X)
+        run_game.game_reset(screen)
+       
+    # Displaying screen
+    screen.fill(BG_COLOR)
+    pygame.draw.line(screen, DARK_GREY, MID_LINE_START, MID_LINE_END)
+    
+    # Displaying score
+    run_game.display_score(screen, text_font)
+   
+    # Updating players, ball and score
+    run_game.game_update(screen)
     # Ball Movement
-    ball_rect.x += ball_speed_x
-    ball_rect.y += ball_speed_y
-    # Ball colliding with top or bottom 
-    if ball_rect.top <= 0 or ball_rect.bottom >= screen_height:
-        ball_speed_y *= -1
-    # Ball colliding with paddle
-    if ball_rect.colliderect(player_one_rect):
-        ball_speed_x *= -1
-    if ball_rect.colliderect(player_two_rect):
-        ball_speed_x *= -1
-    # Ball getting out of bounce
-    if ball_rect.left >= 1020:
-        player_one_score += 1
-        player_one_text = text_font.render(f'{player_one_score}', True, 'grey')
-        ball_rect.center = (500,300)
-        ball_speed_x = 0
-        ball_speed_y = 0
-    if ball_rect.right <= -20:
-        player_two_score += 1
-        player_two_text = text_font.render(f'{player_two_score}', True, 'grey')
-        ball_rect.center = (500,300)
-        ball_speed_x = 0
-        ball_speed_y = 0
-
-            
-
-        
-
-    
-        
-
-    
-    
-    
-    screen.fill('black')
-    pygame.draw.line(screen, 'grey', (500,0), (500,600))
-    screen.blit(player_one_text, (470,300))
-    screen.blit(player_two_text, (520,300))
-    screen.blit(player_one_surf, player_one_rect)
-    screen.blit(player_two_surf, player_two_rect)
-    pygame.draw.ellipse(screen, 'grey', ball_rect)
-    
-    
+    ball.ball_movement()
 
     pygame.display.flip()
     clock.tick(60)
