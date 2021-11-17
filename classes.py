@@ -3,6 +3,7 @@ from random import choice
 import pygame
 from variables import *
 
+
 class Block(pygame.sprite.Sprite):
     def __init__(self, width, height, pos_x, pos_y):
         super().__init__()
@@ -46,15 +47,20 @@ class Ball(Block):
         
     def collisons(self):
         if self.rect.top <= 0 or self.rect.bottom >= SCREEN_HEIGHT:
+            self.play_sound()
             self.speed_y *= -1
         if pygame.sprite.spritecollide(self, self.players_group, False):
+            self.play_sound()
             self.speed_x *= -1
     
     def reset_ball(self):
         self.rect.center = (BALL_INIT_POS_X, BALL_INIT_POS_Y)
         self.speed_x *= -1
         self.move = False
-                  
+    
+    def play_sound(self):
+        pygame.mixer.init()
+        pygame.mixer.Sound.play(pygame.mixer.Sound('sounds/plop.ogg'))                  
         
 class Run_Game:
     def __init__(self, players_group, ball_group):
@@ -64,10 +70,10 @@ class Run_Game:
         self.player_two_score = 0
         
     def score_count(self):
-        if self.ball_group.sprite.rect.x >= SCREEN_WIDTH + 20:
+        if self.ball_group.sprite.rect.x >= SCREEN_WIDTH + 5:
             self.player_one_score += 1
             self.ball_group.sprite.reset_ball()
-        if self.ball_group.sprite.rect.x <= 0 - 20:
+        if self.ball_group.sprite.rect.x <= 0 - 5:
             self.player_two_score += 1
             self.ball_group.sprite.reset_ball()
         
