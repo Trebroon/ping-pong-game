@@ -1,3 +1,4 @@
+import pygame
 # Variables used in game
 # Screen
 SCREEN_WIDTH = 1000

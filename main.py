@@ -13,9 +13,7 @@ def main():
 
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption(CAPTION)
-    text_font = pygame.font.Font(FONT_PATH, FONT_SIZE)
-    active = False
-
+    text_font = pygame.font.Font(FONT_PATH, FONT_SIZE)    
 
     players_group = pygame.sprite.Group()
     # Player One
